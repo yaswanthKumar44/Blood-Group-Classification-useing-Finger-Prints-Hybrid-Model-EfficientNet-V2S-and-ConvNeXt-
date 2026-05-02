@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fingerprint Blood Group Detection 🩸</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #f5f6fa;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #e84118;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .upload-container {
+      border: 2px dashed #718093;
+      background: #fff;
+      padding: 40px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      border-radius: 15px;
+      transition: 0.3s;
+    }
+
+    .upload-container.dragover {
+      background: #e3f2fd;
+      border-color: #0984e3;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label {
+      background: #0984e3;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    label:hover {
+      background: #74b9ff;
+    }
+
+    .preview {
+      margin-top: 20px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .result {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    .result h2 {
+      color: #2d3436;
+      margin-bottom: 15px;
+    }
+
+    .image-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .image-grid img {
+      width: 220px;
+      border-radius: 10px;
+      border: 2px solid #dcdde1;
+    }
+
+    .footer {
+      margin-top: 30px;
+      color: #636e72;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      margin-top: 10px;
+      color: #636e72;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🩸 Fingerprint Blood Group Detection</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="upload-container" id="dropZone">
+      <p><strong>Drag & Drop</strong> your fingerprint image here<br>or</p>
+      <label for="file">Choose File</label>
+      <input type="file" name="file" id="file" accept="image/*" required>
+      <div class="note">💡 You can also paste an image (Ctrl+V)</div>
+      <div class="preview" id="preview"></div>
+    </div>
+    <br>
+    <button type="submit" style="background:#e84118;color:#fff;border:none;padding:12px 30px;
+    border-radius:10px;font-size:1rem;cursor:pointer;">Detect Blood Group</button>
+  </form>
+
+  {% if result %}
+  <div class="result">
+    <h2>{{ result }}</h2>
+    {% if original %}
+    <div class="image-grid">
+      <div>
+        <h4>Original</h4>
+        <img src="{{ url_for('static', filename='uploads/' + original) }}" alt="Original Fingerprint">
+      </div>
+      {% if gray %}
+      <div>
+        <h4>Grayscale</h4>
+        <img src="{{ url_for('static', filename='gray/' + gray) }}" alt="Grayscale Image">
+      </div>
+      {% endif %}
+      {% if overlay %}
+      <div>
+        <h4>Ridge Overlay</h4>
+        <img src="{{ url_for('static', filename='overlay/' + overlay) }}" alt="Overlay Image">
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('file');
+    const preview = document.getElementById('preview');
+
+    // Drag and drop handling
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        fileInput.files = e.dataTransfer.files;
+        previewImage(file);
+      }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) previewImage(file);
+    });
+
+    // Paste-to-upload
+    window.addEventListener('paste', (e) => {
+      const items = e.clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          const file = new File([blob], "pasted_image.png", { type: "image/png" });
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          fileInput.files = dt.files;
+          previewImage(file);
+        }
+      }
+    });
+
+    function previewImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>

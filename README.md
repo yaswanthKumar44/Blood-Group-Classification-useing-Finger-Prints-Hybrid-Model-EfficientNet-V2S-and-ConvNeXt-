@@ -1,6 +1,6 @@
 # Blood Group Detection using Fingerprints
 
-![Project Banner](https://via.placeholder.com/1200x300.png?text=Blood+Group+Detection+Project)
+
 
 ## 🎯 Overview
 
@@ -47,7 +47,7 @@ This repository contains a **hybrid deep‑learning model** that combines **Effi
 
 ```bash
 # Clone the repository
-git clone "https://github.com/your‑username/blood‑group‑fingerprint‑classifier.git"
+git clone "https://github.com/yaswanthKumar44/Blood-Group-Classification-useing-Finger-Prints-Hybrid-Model-EfficientNet-V2S-and-ConvNeXt-.git"
 cd blood‑group‑fingerprint‑classifier
 
 # Create a virtual environment
